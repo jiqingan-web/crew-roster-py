@@ -1,0 +1,5 @@
+# 核心引擎（roster/）仅用 Python 标准库；以下为界面与测试依赖
+streamlit>=1.36
+plotly>=5.20
+pandas>=2.0
+pytest>=8.0

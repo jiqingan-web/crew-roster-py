@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+# 本地排班状态 / 导出文件
+state.json
+*.state.json
+.roster_py/
+out/
+*.log

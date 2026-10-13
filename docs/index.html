@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机组智能排班助手 · Python 版</title>
+<style>
+:root{--bg:#0b1426;--pn:#122038;--bd:#22365a;--tx:#e6eefb;--mut:#8aa0b8;--ac:#3ea6ff;--ok:#2ecc8f;--wa:#ffb020}
+*{box-sizing:border-box}body{margin:0;font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--tx)}
+a{color:var(--ac)}.w{max-width:1100px;margin:0 auto;padding:0 20px}
+header{padding:56px 0 30px;background:linear-gradient(160deg,#10305c,#0b1426)}h1{font-size:34px;margin:0 0 8px}
+.sub{color:var(--mut);font-size:17px}.btns{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:10px 18px;border-radius:9px;background:var(--pn);border:1px solid var(--bd);color:var(--tx);text-decoration:none;font-weight:600}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#04213d}.btn:hover{filter:brightness(1.15)}
+.note{margin-top:18px;padding:10px 14px;border-left:3px solid var(--wa);background:rgba(255,176,32,.08);color:#ffd27a;border-radius:4px}
+h2{margin:44px 0 14px;font-size:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:16px}.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:var(--mut);font-size:14px}
+figure{margin:0;background:var(--pn);border:1px solid var(--bd);border-radius:12px;overflow:hidden}figure img{width:100%;display:block}
+figcaption{padding:8px 12px;color:var(--mut);font-size:13px}
+pre{background:#060d1a;border:1px solid var(--bd);border-radius:10px;padding:14px;overflow:auto;font-size:13.5px;line-height:1.6}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid var(--bd);padding:6px 10px;text-align:left}th{background:var(--pn)}
+footer{margin:60px 0 30px;color:var(--mut);font-size:13px;text-align:center}
+</style></head><body>
+<header><div class="w">
+<h1>✈ 机组智能排班助手 · Python 版</h1>
+<div class="sub">A320 机队 · 成都基地 · 月度飞行机组排班：自动排班、合规校验、请假调配、执勤（FDP）监控与超执勤处置。纯标准库排班引擎 + Streamlit 中文界面 + 命令行，与网页版结果逐项一致。</div>
+<div class="btns">
+<a class="btn p" href="https://github.com/jiqingan-web/crew-roster-py/archive/refs/heads/main.zip">⬇ 下载 ZIP</a>
+<a class="btn" href="https://github.com/jiqingan-web/crew-roster-py">GitHub 仓库</a>
+<a class="btn" href="https://jiqingan-web.github.io/crew-roster-demo/">🌐 网页版在线演示</a>
+<a class="btn" href="https://codespaces.new/jiqingan-web/crew-roster-py?quickstart=1">☁ 在 Codespaces 中打开</a>
+</div>
+<div class="note">说明：Python 版需在本机（或 GitHub Codespaces）运行，本页面仅为介绍，GitHub Pages 无法运行 Python。想直接在浏览器中体验，请打开<a href="https://jiqingan-web.github.io/crew-roster-demo/">网页版在线演示</a>。</div>
+</div></header>
+<main class="w">
+<h2>功能</h2>
+<div class="grid">
+<div class="card"><h3>⚡ 自动排班</h3><p>贪心 + 局部改进 + 交换 + 置换链修复 + 削峰 + 备份分配；148 个任务满员、硬性违规 0，工时公平均衡（基尼约 0.033）。</p></div>
+<div class="card"><h3>✔ 合规校验</h3><p>RE12 座位搭配、特殊机场授权、A321、新机长须教员、休息 ≥12h、CAAC 90h 硬上限、血压测试仪机场、FDP 限制表。</p></div>
+<div class="card"><h3>🗓 请假调配</h3><p>3–5 个方案：调用备份 / 节奏最优 / 工时均衡 / 链式调换 / 人工兜底，影响指标、预览、一键应用与撤销。</p></div>
+<div class="card"><h3>⏱ 执勤监控</h3><p>逐段录入实际/预计起飞落地，实时推算 FDP、余量、过夜休息与下游影响，生成拆分换组等处置方案。</p></div>
+<div class="card"><h3>📊 甘特图与报告</h3><p>plotly 甘特图可缩放平移；工时分布、节奏、执勤风险面板与问题明细。</p></div>
+<div class="card"><h3>⇄ 与网页版互通</h3><p>JSON 备份格式相同可互相导入；CSV 导出可直接用 Excel 打开；附命令行工具。</p></div>
+</div>
+<h2>截图</h2>
+<div class="grid">
+<figure><img src="img/01_人员视图.png" alt="人员视图" loading="lazy"><figcaption>人员视图 · 甘特图</figcaption></figure>
+<figure><img src="img/06_执勤监控.png" alt="执勤监控" loading="lazy"><figcaption>执勤监控 · 按实际/预计时刻</figcaption></figure>
+<figure><img src="img/10_超执勤方案.png" alt="超执勤方案" loading="lazy"><figcaption>超执勤处置方案</figcaption></figure>
+<figure><img src="img/05_请假调配.png" alt="请假调配" loading="lazy"><figcaption>请假调配方案</figcaption></figure>
+<figure><img src="img/03_校验报告.png" alt="校验报告" loading="lazy"><figcaption>校验报告</figcaption></figure>
+<figure><img src="img/08_设置.png" alt="设置" loading="lazy"><figcaption>设置 · FDP 限制表（默认值可修改）</figcaption></figure>
+</div>
+<h2>本机运行</h2>
+<div class="grid">
+<div><b>Mac</b><pre>git clone https://github.com/jiqingan-web/crew-roster-py.git
+cd crew-roster-py
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py</pre></div>
+<div><b>Windows（PowerShell）</b><pre>git clone https://github.com/jiqingan-web/crew-roster-py.git
+cd crew-roster-py
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+streamlit run app.py</pre></div>
+</div>
+<p>未安装 git 时可先<a href="https://github.com/jiqingan-web/crew-roster-py/archive/refs/heads/main.zip">下载 ZIP</a> 解压，再执行除 <code>git clone</code> 外的命令。浏览器会打开 <code>http://localhost:8501</code>，需要 Python 3.9+。</p>
+<h2>命令行</h2>
+<pre>python -m roster sample -o sample.json
+python -m roster autofill sample.json -o filled.json
+python -m roster report filled.json --csv out/
+python -m roster leave filled.json --pilot 毛华 --days 9-14
+python -m roster fdp filled.json --date 27 --pr PR140 --leg "EU2550=16:45,18:10,act" --leg "EU8035=-,23:05"</pre>
+<h2>与网页版对照</h2>
+<table><tr><th>项目</th><th>结果（两版一致）</th></tr>
+<tr><td>示例数据</td><td>100 人 / 148 任务 / 1895h，逐字段相同</td></tr>
+<tr><td>自动排班</td><td>满员 100%、硬性 0；148 个任务机组与 30 个备份日完全相同；工时 51.4–67.6h，基尼 0.0328</td></tr>
+<tr><td>请假 / 执勤处置方案</td><td>方案名称、顺序、评分、变更内容与推荐项相同</td></tr>
+<tr><td>速度</td><td>自动排班网页版约 1.3 s，Python 约 4 s</td></tr></table>
+</main>
+<footer>机组智能排班助手 · <a href="https://github.com/jiqingan-web/crew-roster-py">crew-roster-py</a> · <a href="https://jiqingan-web.github.io/crew-roster-demo/">网页版演示</a></footer>
+</body></html>
