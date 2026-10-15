@@ -66,6 +66,50 @@ CAT_DESC = {
     'J1': '克拉玛依：左座 J1 及以上', 'US': '茅台/吕梁/忻州：左座 US 及以上', 'NONE': '无特殊要求'}
 AUTH_CATS = ['LHASA', 'HIGH', 'PLATEAU', 'ZBCF']
 
+def defaultHealth():
+    return {'noFly': False, 'noPlateau': False, 'noNight': False, 'bpNote': '', 'medExamExpiry': '', 'note': ''}
+
+def authAirports(st=None):
+    A = (st or {}).get('airports') or AIRPORTS
+    return sorted([c for c, v in A.items() if (v[3] if len(v) > 3 else 'NONE') in AUTH_CATS], key=lambda c: apName(c, st))
+
+def hasHealthRestriction(h):
+    h = h or {}
+    return bool(h.get('noFly') or h.get('noPlateau') or h.get('noNight') or (h.get('bpNote') or '').strip() or (h.get('medExamExpiry') or '').strip() or (h.get('note') or '').strip())
+
+def isPlateauAirport(c, st=None):
+    return apCat(c, st) in ('LHASA', 'HIGH', 'PLATEAU')
+
+def migratePilots(st):
+    if not st or not st.get('pilots'): return st
+    squads = ['一大队', '二大队', '三大队', '教学中队']
+    for i, p in enumerate(st['pilots']):
+        h = defaultHealth(); h.update(p.get('health') or {}); p['health'] = h
+        if not p.get('squad'):
+            p['squad'] = '教学中队' if isInstr(p['rank']) else squads[i % 3]
+        if not isinstance(p.get('auth'), list): p['auth'] = []
+    return st
+
+def healthBlocks(p, pr, st):
+    h = p.get('health') or {}; rs = []
+    if h.get('noFly'): rs.append('暂时不适飞')
+    if h.get('noPlateau') and any(isPlateauAirport(l['from'], st) or isPlateauAirport(l['to'], st) for l in pr['legs']):
+        rs.append('限制高原（任务含高原/拉萨类机场）')
+    if h.get('noNight') and any(isNightLeg(l) for l in pr['legs']):
+        rs.append('限制夜间（任务含夜航段）')
+    exp = h.get('medExamExpiry') or ''
+    if exp:
+        try:
+            from datetime import datetime
+            ed = datetime.strptime(exp, '%Y-%m-%d')
+            for d in daysTouched(pr, st):
+                if datetime(YEAR, MONTH, d) > ed:
+                    rs.append('体检已过期(' + exp + ')'); break
+        except ValueError:
+            pass
+    return rs
+
+
 
 def _ap(c, st):
     a = None
@@ -304,6 +348,7 @@ def personCheck(p, pr, st, idx, opt=None):
     h = pairingHours(pr); already = includes_obj(idx['sched'][p['id']], pr)
     cap = hardCap(st)
     if not already and idx['hours'][p['id']] + h > cap + 1e-9: rs.append('超出法规硬上限' + _num(cap) + 'h')
+    rs.extend(healthBlocks(p, pr, st))
     return [len(rs) == 0, rs]
 
 

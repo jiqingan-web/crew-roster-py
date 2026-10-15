@@ -2,7 +2,7 @@
 
 时间：自 2026-11-01 00:00 起的分钟数（DAY = 1440），可跨午夜。
 
-Pilot   = {id, name, rank, auth: [ICAO], prefs: [日], leave: [日]}
+Pilot   = {id, name, rank, auth: [ICAO], prefs: [日], leave: [日], squad?, health?: {noFly,noPlateau,noNight,bpNote,medExamExpiry,note}}
 Leg     = {d: 任务内第几天, flt, from, to, dep, arr, ac: 'A320'|'A321', reg?: 机号如 'B-32GV'}
 Pairing = {id, start, ndays, ac, legs: [Leg], crew: {C, F, T}, freshAt?, splitFrom?}
 State   = {version, sample, settings, pilots, pairings, standby: {pilotId: [日]}, airports?: {ICAO: [名称, 纬度, 经度, 类别]},

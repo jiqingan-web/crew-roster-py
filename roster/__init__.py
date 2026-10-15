@@ -3,7 +3,8 @@ from .rules import *  # noqa: F401,F403
 from .rules import (YEAR, MONTH, DAYS, DAY, RANK_VAL, RANKS, GROUPS, AIRPORTS, CAT_DESC, AUTH_CATS, LEG_COLS, SLOT_NAME, SLOTS,
                     defaultSettings, defaultFdpTable, migrateSettings, pairingHours, report, release, daysTouched, fmtT, fmtH,
                     crewIssue, personCheck, buildIndex, candidates, dayStatus, restGaps, freeRuns, shareFor, fdpDays, fdpLimit, legKey,
-                    apName, apCat, isSpecial, specialAirportsOf, isNightLeg, rankGroup, seatOK, catOK, blockMin, rng)
+                    apName, apCat, isSpecial, specialAirportsOf, isNightLeg, rankGroup, seatOK, catOK, blockMin, rng,
+                    defaultHealth, authAirports, hasHealthRestriction, healthBlocks, migratePilots, isPlateauAirport)
 from .generator import generateSample, assignAircraftRegs, ensureAircraftRegs, FLEET
 from .metrics import validate, summarize, stats
 from .solver import autoFill, assignStandby, trimPeaks, repairPrefs, repairUnfilled

@@ -24,6 +24,8 @@ def validate(st):
             for r in rs:
                 t = '请假冲突' if r.startswith('请假') else '时间重叠' if r.startswith('时间') else '休息不足' if r.startswith('休息') else None
                 if t: add(t, 'hard', f"{pr['id']} {p['name']}：{r}", pr, p['id'])
+                elif ('不适飞' in r) or ('体检已过期' in r): add('健康限制', 'hard', f"{pr['id']} {p['name']}：{r}", pr, p['id'])
+                elif ('限制高原' in r) or ('限制夜间' in r): add('健康限制', 'soft', f"{pr['id']} {p['name']}：{r}", pr, p['id'])
             prefs = p.get('prefs') or []
             pf = [d for d in daysTouched(pr, st) if d in prefs]
             if pf: add('意向休息日未满足', 'soft', f"{pr['id']} {p['name']} 意向休息日 {','.join(map(str, pf))} 日被排班", pr, p['id'])

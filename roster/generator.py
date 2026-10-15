@@ -2,7 +2,7 @@
 import math
 
 from .rules import (AIRPORTS, AUTH_CATS, DAYS, DAY, RANK_VAL, isFO, isInstr, isNew, rng, blockMin,
-                    defaultSettings, pairingHours)
+                    defaultSettings, pairingHours, defaultHealth)
 from .jsutil import jsorted
 
 SUR = '王李张刘陈杨黄赵吴周徐孙马朱胡郭何高林罗郑梁谢宋唐许韩冯邓曹彭曾肖田董袁潘于蒋蔡余杜叶程苏魏吕丁任沈姚卢姜崔钟谭陆汪范金石廖贾夏韦付方邹熊白孟秦邱江尹薛闫段雷侯龙史陶黎贺顾毛郝龚邵万钱严覃武戴莫孔向汤'
@@ -41,7 +41,8 @@ def generateSample(seed=None, opt=None):
                 v = RANK_VAL[rk]
                 if v >= 6: auth = [x for x in specialAll if _cat(x) != 'LHASA' and r() < 0.85]
                 elif v >= 4: auth = [x for x in specialAll if _cat(x) in ('PLATEAU', 'ZBCF') and r() < 0.6]
-            pilots.append({'id': 'E' + str(no), 'name': nm, 'rank': rk, 'auth': auth, 'prefs': [], 'leave': []})
+            squad = '教学中队' if isInstr(rk) else ['一大队', '二大队', '三大队'][len(pilots) % 3]
+            pilots.append({'id': 'E' + str(no), 'name': nm, 'rank': rk, 'auth': auth, 'prefs': [], 'leave': [], 'squad': squad, 'health': defaultHealth()})
     S = defaultSettings()
     offCount = {'C': [0] * (DAYS + 1), 'F': [0] * (DAYS + 1)}
 
@@ -128,6 +129,16 @@ def generateSample(seed=None, opt=None):
     pairings.sort(key=lambda p: p['legs'][0]['dep'])
     for i, p in enumerate(pairings): p['id'] = 'PR' + str(i + 1).zfill(3)
     assignAircraftRegs(pairings)
+    H = [
+        (4, {'noPlateau': True, 'note': '高原机场暂不适任（演示）'}),
+        (9, {'noNight': True, 'bpNote': '血压偏高随访中', 'note': '限制夜航（演示）'}),
+        (14, {'noFly': True, 'medExamExpiry': '2026-10-20', 'note': '体检复查前不适飞（演示）'}),
+        (19, {'medExamExpiry': '2026-11-05', 'bpNote': '须携带血压记录本'}),
+        (24, {'noPlateau': True, 'noNight': True, 'note': '综合健康限制（演示）'}),
+    ]
+    for i, h in H:
+        if i < len(pilots):
+            hh = defaultHealth(); hh.update(h); pilots[i]['health'] = hh
     return {'version': 1, 'sample': True, 'settings': S, 'pilots': pilots, 'pairings': pairings}
 
 FLEET = {
