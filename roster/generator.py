@@ -127,4 +127,37 @@ def generateSample(seed=None, opt=None):
         total += pairingHours(p); pairings.append(p)
     pairings.sort(key=lambda p: p['legs'][0]['dep'])
     for i, p in enumerate(pairings): p['id'] = 'PR' + str(i + 1).zfill(3)
+    assignAircraftRegs(pairings)
     return {'version': 1, 'sample': True, 'settings': S, 'pilots': pilots, 'pairings': pairings}
+
+FLEET = {
+    'A320': ['B-32GV','B-32HC','B-30A1','B-30C8','B-30E2','B-32JF','B-32KH','B-30F6','B-32LM','B-30G9','B-32NP','B-30H3','B-32QR','B-30J5','B-32ST','B-30K7','B-32UV','B-30L1'],
+    'A321': ['B-32WX','B-30M4','B-32YZ'],
+}
+
+def assignAircraftRegs(pairings):
+    busy = {r: -1e9 for r in sum(FLEET.values(), [])}
+    turn = 35
+    items = []
+    for pr in pairings:
+        for i, l in enumerate(pr['legs']): items.append((pr, l, i))
+    items.sort(key=lambda x: (x[1]['dep'], x[0]['id'], x[2]))
+    lastReg = {}
+    for pr, l, _i in items:
+        pool = FLEET.get(l.get('ac') or 'A320', FLEET['A320'])
+        pk = pr['id'] + '#' + str(l['d'])
+        prefer = lastReg.get(pk); best = None
+        if prefer is not None and busy[prefer] + turn <= l['dep']: best = prefer
+        if best is None:
+            bestT = 1e18
+            for r in pool:
+                if busy[r] + turn <= l['dep'] and busy[r] < bestT:
+                    best = r; bestT = busy[r]
+        if best is None:
+            best = sorted(pool, key=lambda r: (busy[r], r))[0]
+        l['reg'] = best; lastReg[pk] = best; busy[best] = max(busy[best], l['arr'])
+
+def ensureAircraftRegs(st):
+    if not st or not st.get('pairings'): return
+    if any(not l.get('reg') for p in st['pairings'] for l in p['legs']):
+        assignAircraftRegs(st['pairings'])

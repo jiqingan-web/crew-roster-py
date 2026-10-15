@@ -169,3 +169,55 @@ def fdpOptions(st, prId, opt=None):
     ok = [x for x in out if not x['unresolved'] and not x['fdpAfter']]
     if ok: ok[0]['recommended'] = True
     return {'pairing': pr0, 'days': ds0, 'exceed': ex, 'downstream': dn0, 'solutions': out, 'ms': int((time.time() - t0) * 1000)}
+
+
+def aircraftDay(st, date):
+    """按机号汇总某日航段（供飞机甘特）。与网页版 RosterCore.aircraftDay 一致。"""
+    from .generator import ensureAircraftRegs
+    ensureAircraftRegs(st)
+    acts = st.get('actuals') or {}
+    day0 = (date - 1) * DAY; day1 = date * DAY
+    rows = {}
+    for pr in st['pairings']:
+        ds = fdpDays(pr, st, acts)
+        for i, leg in enumerate(pr['legs']):
+            a = acts.get(legKey(leg)) or {}
+            dep = a['dep'] if a.get('dep') is not None else leg['dep']
+            if a.get('arr') is not None: arr = a['arr']
+            elif a.get('dep') is not None: arr = a['dep'] + (leg['arr'] - leg['dep'])
+            else: arr = leg['arr']
+            depDate = int(dep // DAY) + 1
+            arrDate = int(max(arr - 1, dep) // DAY) + 1
+            if not (depDate == date or arrDate == date or (depDate < date and arrDate > date)):
+                continue
+            dy = next((x for x in ds if any(z['i'] == i for z in x['legs'])), None) or next((x for x in ds if x['d'] == leg['d']), None)
+            lateArr = arr - leg['arr']; lateDep = dep - leg['dep']
+            risk = dy['risk'] if dy else 'low'
+            if risk in ('over', 'high'): color = 'over'
+            elif risk == 'med' or lateArr > 30 or lateDep > 30: color = 'med'
+            elif lateArr > 10 or lateDep > 10: color = 'late'
+            else: color = 'ok'
+            reg = leg.get('reg') or '—'
+            rows.setdefault(reg, []).append({
+                'leg': leg, 'pr': pr, 'i': i, 'dep': dep, 'arr': arr,
+                'planDep': leg['dep'], 'planArr': leg['arr'], 'lateDep': lateDep, 'lateArr': lateArr,
+                'risk': risk, 'buffer': dy['buffer'] if dy else None, 'color': color, 'dy': dy,
+                'known': a.get('dep') is not None or a.get('arr') is not None,
+                'kind': a.get('kind') or 'est', 'landed': a.get('kind') == 'act' and a.get('arr') is not None,
+            })
+    list_ = []
+    for reg, items in rows.items():
+        items.sort(key=lambda x: x['dep'])
+        list_.append({'reg': reg, 'ac': items[0]['leg'].get('ac') or 'A320', 'items': items,
+                      'nLate': sum(1 for x in items if x['lateArr'] > 10),
+                      'nRisk': sum(1 for x in items if x['color'] in ('over', 'med'))})
+    list_.sort(key=lambda r: r['reg'])
+    tMax = day1
+    for r in list_:
+        for x in r['items']:
+            if x['arr'] > tMax: tMax = x['arr']
+    tMax = max(tMax, day1)
+    tMin = day0
+    deps = [x['dep'] for r in list_ for x in r['items']]
+    if deps: tMin = min(day0, max(day0 - 60, min(deps) - 60))
+    return {'date': date, 'day0': day0, 'tMin': tMin, 'tMax': tMax, 'rows': list_}

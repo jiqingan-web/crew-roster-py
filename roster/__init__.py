@@ -4,11 +4,11 @@ from .rules import (YEAR, MONTH, DAYS, DAY, RANK_VAL, RANKS, GROUPS, AIRPORTS, C
                     defaultSettings, defaultFdpTable, migrateSettings, pairingHours, report, release, daysTouched, fmtT, fmtH,
                     crewIssue, personCheck, buildIndex, candidates, dayStatus, restGaps, freeRuns, shareFor, fdpDays, fdpLimit, legKey,
                     apName, apCat, isSpecial, specialAirportsOf, isNightLeg, rankGroup, seatOK, catOK, blockMin, rng)
-from .generator import generateSample
+from .generator import generateSample, assignAircraftRegs, ensureAircraftRegs, FLEET
 from .metrics import validate, summarize, stats
 from .solver import autoFill, assignStandby, trimPeaks, repairPrefs, repairUnfilled
 from .leave import applyLeave, leaveOptions, evaluate, fillVac, STRATS
-from .fdp import (migrateDelays, pairingRisk, fdpRiskSummary, downstream, dutyMonitor, splitPairing, fdpOptions, RISK_ORDER, RISK_TXT)
+from .fdp import (migrateDelays, pairingRisk, fdpRiskSummary, downstream, dutyMonitor, splitPairing, fdpOptions, aircraftDay, RISK_ORDER, RISK_TXT)
 from .history import History, apply_solution
 from . import io
 
